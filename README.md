@@ -16,6 +16,20 @@ This repo also includes:
 - a Docker Compose setup for self-hosted n8n
 - a lightweight Node writer script that works inside the n8n container
 
+## Screenshots
+
+### n8n Workflow
+
+![n8n workflow for AI content generation and Markdown publishing](<workflow screenshot.png>)
+
+### Generated Markdown Output
+
+![Generated Markdown file created by the workflow](<generated markdown screenshot.png>)
+
+### MkDocs Site Preview
+
+![MkDocs preview of the generated AI content page](<site preview screenshot.png>)
+
 ## What This Project Does
 
 The workflow automates this sequence:
