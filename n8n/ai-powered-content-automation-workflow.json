@@ -1,0 +1,102 @@
+{
+  "name": "AI-Powered Content Automation Workflow with n8n",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "productName",
+              "value": "FocusFlow AI"
+            }
+          ]
+        }
+      },
+      "id": "set-product",
+      "name": "Set Product",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const productName = $json.productName;\n\nreturn [{\n  json: {\n    productName,\n    shortCopy: `${productName} helps busy teams turn ideas into polished content in minutes.`,\n    socialCopy: `Meet ${productName}: the faster way to plan, draft, and publish content without slowing down your team.`,\n    landingCopy: `${productName} is built for startups, marketers, and creators who need high-quality content at speed. It streamlines ideation, drafting, and publishing so your team can move from concept to campaign with less manual work.`\n  }\n}];"
+      },
+      "id": "mock-gpt",
+      "name": "Mock GPT Copy",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python3 /files/scripts/render_content.py '{{ JSON.stringify($json) }}'"
+      },
+      "id": "write-markdown",
+      "name": "Write Markdown File",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        980,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Product": {
+      "main": [
+        [
+          {
+            "node": "Mock GPT Copy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock GPT Copy": {
+      "main": [
+        [
+          {
+            "node": "Write Markdown File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "pinData": {},
+  "versionId": "1"
+}

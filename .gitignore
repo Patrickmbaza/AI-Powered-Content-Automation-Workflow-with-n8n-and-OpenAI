@@ -1,0 +1,6 @@
+site/
+n8n_data/
+__pycache__/
+*.pyc
+.env
+*.log

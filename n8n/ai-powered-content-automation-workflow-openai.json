@@ -1,0 +1,145 @@
+{
+  "name": "AI-Powered Content Automation Workflow with n8n (OpenAI)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "productName",
+              "value": "FocusFlow AI"
+            }
+          ]
+        }
+      },
+      "id": "set-product",
+      "name": "Set Product",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.OPENAI_API_KEY}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-5.4\",\n  \"input\": [\n    {\n      \"role\": \"system\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": \"Return JSON only. Create marketing copy for the provided product. The JSON must include productName, shortCopy, socialCopy, and landingCopy.\"\n        }\n      ]\n    },\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"input_text\",\n          \"text\": \"Product name: {{$json.productName}}\"\n        }\n      ]\n    }\n  ],\n  \"text\": {\n    \"format\": {\n      \"type\": \"json_schema\",\n      \"name\": \"marketing_copy\",\n      \"strict\": true,\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"productName\": { \"type\": \"string\" },\n          \"shortCopy\": { \"type\": \"string\" },\n          \"socialCopy\": { \"type\": \"string\" },\n          \"landingCopy\": { \"type\": \"string\" }\n        },\n        \"required\": [\"productName\", \"shortCopy\", \"socialCopy\", \"landingCopy\"],\n        \"additionalProperties\": false\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "openai-responses",
+      "name": "OpenAI Responses API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $json.output?.[0]?.content?.[0];\n\nif (!item) {\n  throw new Error('No model output found');\n}\n\nif (item.type === 'refusal') {\n  throw new Error(`Model refused request: ${item.refusal}`);\n}\n\nlet parsed;\nif (item.parsed) {\n  parsed = item.parsed;\n} else if (item.text) {\n  parsed = JSON.parse(item.text);\n} else {\n  throw new Error('No parsable JSON returned');\n}\n\nreturn [{ json: parsed }];"
+      },
+      "id": "parse-openai-json",
+      "name": "Parse OpenAI JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "node /files/scripts/render_content.mjs '{{ JSON.stringify($json) }}'"
+      },
+      "id": "write-markdown",
+      "name": "Write Markdown File",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Product": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Responses API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Responses API": {
+      "main": [
+        [
+          {
+            "node": "Parse OpenAI JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse OpenAI JSON": {
+      "main": [
+        [
+          {
+            "node": "Write Markdown File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "pinData": {},
+  "versionId": "1"
+}

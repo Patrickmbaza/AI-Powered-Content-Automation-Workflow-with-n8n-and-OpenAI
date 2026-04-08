@@ -1,0 +1,4 @@
+site_name: AI-Powered Content Automation Workflow
+site_description: Demo site for n8n-driven AI content generation
+theme:
+  name: mkdocs
