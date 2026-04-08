@@ -20,15 +20,15 @@ This repo also includes:
 
 ### n8n Workflow
 
-![n8n workflow for AI content generation and Markdown publishing](<workflow screenshot.png>)
+![n8n workflow for AI content generation and Markdown publishing](assets/workflow-screenshot.png)
 
 ### Generated Markdown Output
 
-![Generated Markdown file created by the workflow](<generated markdown screenshot.png>)
+![Generated Markdown file created by the workflow](assets/generated-markdown-screenshot.png)
 
 ### MkDocs Site Preview
 
-![MkDocs preview of the generated AI content page](<site preview screenshot.png>)
+![MkDocs preview of the generated AI content page](assets/site-preview-screenshot.png)
 
 ## What This Project Does
 
